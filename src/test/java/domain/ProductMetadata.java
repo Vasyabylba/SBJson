@@ -1,20 +1,19 @@
-package ru.clevertec.jsonparser.domain;
+package domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Product {
+public class ProductMetadata {
     private UUID id;
-    private String name;
-    private Double price;
-    private Map<ProductType, ProductMetadata> details;
+    private String manufacturer;
+    private BigDecimal weight;
 }

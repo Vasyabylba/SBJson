@@ -1,4 +1,4 @@
-package ru.clevertec.jsonparser.core;
+package ru.clevertec.sbjson.databind.element;
 
 public abstract class ContainerElement extends JsonElement implements JsonElementCreator {
     protected final JsonElementFactory elementFactory;

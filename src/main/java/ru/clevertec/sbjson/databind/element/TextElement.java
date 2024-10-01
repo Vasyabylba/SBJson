@@ -1,4 +1,4 @@
-package ru.clevertec.jsonparser.core;
+package ru.clevertec.sbjson.databind.element;
 
 public class TextElement extends ValueElement {
     static final TextElement EMPTY_STRING_NODE = new TextElement("");

@@ -1,4 +1,4 @@
-package ru.clevertec.jsonparser.core;
+package ru.clevertec.sbjson.databind.element;
 
 public class NumericElement extends ValueElement {
     protected final Number value;

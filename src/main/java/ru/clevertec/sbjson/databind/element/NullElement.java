@@ -1,4 +1,4 @@
-package ru.clevertec.jsonparser.core;
+package ru.clevertec.sbjson.databind.element;
 
 public class NullElement extends ValueElement {
     public static final NullElement instance = new NullElement();

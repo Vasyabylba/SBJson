@@ -1,4 +1,4 @@
-package ru.clevertec.jsonparser.core;
+package ru.clevertec.sbjson.databind.element;
 
 public abstract class ValueElement extends JsonElement {
     @Override

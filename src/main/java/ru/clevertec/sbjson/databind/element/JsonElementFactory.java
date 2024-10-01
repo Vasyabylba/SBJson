@@ -1,4 +1,4 @@
-package ru.clevertec.jsonparser.core;
+package ru.clevertec.sbjson.databind.element;
 
 public class JsonElementFactory implements JsonElementCreator {
     public static final JsonElementFactory instance = new JsonElementFactory();

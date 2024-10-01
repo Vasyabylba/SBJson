@@ -1,4 +1,4 @@
-package ru.clevertec.jsonparser.domain;
+package domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

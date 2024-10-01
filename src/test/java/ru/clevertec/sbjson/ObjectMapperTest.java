@@ -1,21 +1,23 @@
-package ru.clevertec.jsonparser;
+package ru.clevertec.sbjson;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.clevertec.jsonparser.domain.Customer;
+import domain.Customer;
 import util.TestData;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ObjectMapperTest {
-    com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
-    ObjectMapper objectMapper = new ObjectMapper();
+    com.fasterxml.jackson.databind.ObjectMapper jacksonObjectMapper;
+    ObjectMapper objectMapper;
 
-    @BeforeEach
-    void setup() {
+    public ObjectMapperTest() {
+        jacksonObjectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
         jacksonObjectMapper.registerModule(new JavaTimeModule());
+        jacksonObjectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper = new ObjectMapper();
     }
 
     @Test

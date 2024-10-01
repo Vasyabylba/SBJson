@@ -1,11 +1,12 @@
 package util;
 
-import ru.clevertec.jsonparser.domain.Customer;
-import ru.clevertec.jsonparser.domain.Order;
-import ru.clevertec.jsonparser.domain.Product;
-import ru.clevertec.jsonparser.domain.ProductMetadata;
-import ru.clevertec.jsonparser.domain.ProductType;
+import domain.Customer;
+import domain.Order;
+import domain.Product;
+import domain.ProductMetadata;
+import domain.ProductType;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -18,7 +19,7 @@ public class TestData {
         return ProductMetadata.builder()
                 .id(UUID.randomUUID())
                 .manufacturer("Product manufacturer")
-                .weight(4.523)
+                .weight(BigDecimal.valueOf(4.523))
                 .build();
     }
 

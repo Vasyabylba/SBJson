@@ -1,21 +1,20 @@
-package ru.clevertec.jsonparser.domain;
+package domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.OffsetDateTime;
-import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Order {
+public class Product {
     private UUID id;
-    private List<Product> products;
-    private OffsetDateTime createDate;
-
+    private String name;
+    private Double price;
+    private Map<ProductType, ProductMetadata> details;
 }

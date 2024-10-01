@@ -1,4 +1,6 @@
-package ru.clevertec.jsonparser.core;
+package ru.clevertec.sbjson.databind.element;
+
+import ru.clevertec.sbjson.databind.JsonSerializable;
 
 public abstract class JsonElement implements JsonSerializable {
     protected JsonElement() {

@@ -1,4 +1,4 @@
-package ru.clevertec.jsonparser.domain;
+package domain;
 
 public enum ProductType {
     RETAIL,
