@@ -5,7 +5,6 @@ import ru.clevertec.sbjson.databind.element.JsonElement;
 import ru.clevertec.sbjson.databind.element.JsonElementCreator;
 import ru.clevertec.sbjson.databind.element.JsonElementFactory;
 import ru.clevertec.sbjson.databind.element.ObjectElement;
-import ru.clevertec.sbjson.exception.JsonProcessingException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -132,7 +131,7 @@ public class BaseJsonGenerator implements JsonGenerator {
         try {
             return field.get(object);
         } catch (IllegalAccessException e) {
-            throw new JsonProcessingException(e);
+            throw new RuntimeException(e);
         }
     }
 }

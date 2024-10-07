@@ -1,6 +1,8 @@
 package ru.clevertec.sbjson.exception;
 
-public class JsonProcessingException extends RuntimeException {
+import java.io.IOException;
+
+public class JsonProcessingException extends IOException {
     public JsonProcessingException(String message) {
         super(message);
     }

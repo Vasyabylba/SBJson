@@ -6,6 +6,7 @@ import ru.clevertec.sbjson.core.JsonDeserializer;
 import ru.clevertec.sbjson.core.JsonGenerator;
 import ru.clevertec.sbjson.core.JsonParser;
 import ru.clevertec.sbjson.databind.element.ObjectElement;
+import ru.clevertec.sbjson.exception.JsonProcessingException;
 
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public class ObjectMapper {
         return objectElement.serialize();
     }
 
-    public <T> T toObject(String content, Class<T> valueType) throws Exception {
+    public <T> T toObject(String content, Class<T> valueType) throws JsonProcessingException {
         Map<String, Object> jsonMap = jsonParser.parseJsonObject(content);
         return jsonDeserializer.deserializeObject(jsonMap, valueType);
     }

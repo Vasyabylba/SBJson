@@ -5,6 +5,7 @@ import ru.clevertec.sbjson.exception.MismatchedInputException;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -49,27 +50,32 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 
 public class JsonDeserializer {
-    public <T> T deserializeObject(Map<String, Object> value, Class<T> clazz) throws Exception {
-        T instance = clazz.getDeclaredConstructor().newInstance();
+    public <T> T deserializeObject(Map<String, Object> value, Class<T> clazz) throws JsonProcessingException {
+        try {
+            T instance = clazz.getDeclaredConstructor().newInstance();
 
-        for (Map.Entry<String, Object> field : value.entrySet()) {
-            String fieldName = field.getKey();
-            Object fieldValue = field.getValue();
+            for (Map.Entry<String, Object> field : value.entrySet()) {
+                String fieldName = field.getKey();
+                Object fieldValue = field.getValue();
 
-            checkIfClassContainsFieldWithName(clazz, fieldName);
+                checkIfClassContainsFieldWithName(clazz, fieldName);
 
-            Field clazzField = clazz.getDeclaredField(fieldName);
-            clazzField.setAccessible(true);
-            Class<?> fieldType = clazzField.getType();
-            Type fieldGenericType = clazzField.getGenericType();
+                Field clazzField = clazz.getDeclaredField(fieldName);
+                clazzField.setAccessible(true);
+                Class<?> fieldType = clazzField.getType();
+                Type fieldGenericType = clazzField.getGenericType();
 
-            clazzField.set(instance, deserializeElement(fieldValue, fieldType, fieldGenericType));
+                clazzField.set(instance, deserializeElement(fieldValue, fieldType, fieldGenericType));
+            }
+
+            return instance;
+        } catch (NoSuchFieldException | InvocationTargetException | InstantiationException | IllegalAccessException |
+                 NoSuchMethodException e) {
+            throw new JsonProcessingException(e);
         }
-
-        return instance;
     }
 
-    public <T> T deserializeElement(Object value, Class<T> clazz, Type type) throws Exception {
+    public <T> T deserializeElement(Object value, Class<T> clazz, Type type) throws JsonProcessingException {
         if (value == null) {
             return null;
         } else if (isBoolean(clazz)) {
@@ -95,7 +101,7 @@ public class JsonDeserializer {
         }
     }
 
-    public <T> T deserializeMap(Object value, Class<T> clazz, Type type) throws Exception {
+    public <T> T deserializeMap(Object value, Class<T> clazz, Type type) throws JsonProcessingException {
         if (!(value instanceof Map<?, ?> srcMap)) {
             throw MismatchedInputException.deserializationTypeFrom(type.getTypeName(), "Object");
         }
@@ -107,12 +113,16 @@ public class JsonDeserializer {
         T targetMap = getMapImpl(clazz);
 
         for (Map.Entry<?, ?> entry : srcMap.entrySet()) {
-            Method methodAdd = clazz.getDeclaredMethod("put", Object.class, Object.class);
-            methodAdd.invoke(
-                    targetMap,
-                    deserializeElement(entry.getKey(), (Class<?>) keyType, keyType),
-                    deserializeElement(entry.getValue(), (Class<?>) valueType, valueType)
-            );
+            try {
+                Method methodAdd = clazz.getDeclaredMethod("put", Object.class, Object.class);
+                methodAdd.invoke(
+                        targetMap,
+                        deserializeElement(entry.getKey(), (Class<?>) keyType, keyType),
+                        deserializeElement(entry.getValue(), (Class<?>) valueType, valueType)
+                );
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                throw new JsonProcessingException(e);
+            }
         }
 
         return targetMap;
@@ -129,7 +139,7 @@ public class JsonDeserializer {
         } else return (T) new LinkedHashMap<>();
     }
 
-    public <T> T deserializeCollection(Object value, Class<T> clazz, Type type) throws Exception {
+    public <T> T deserializeCollection(Object value, Class<T> clazz, Type type) throws JsonProcessingException {
         if (!(value instanceof List<?> srcList)) {
             throw MismatchedInputException.deserializationTypeFrom(type.getTypeName(), "Array");
         }
@@ -142,7 +152,7 @@ public class JsonDeserializer {
         }
     }
 
-    private <T> T deserializeSet(List<?> value, Class<T> clazz, Type type) throws Exception {
+    private <T> T deserializeSet(List<?> value, Class<T> clazz, Type type) throws JsonProcessingException {
         T set = getSetImpl(clazz);
         fillCollection(value, clazz, (ParameterizedType) type, set);
         return set;
@@ -157,7 +167,7 @@ public class JsonDeserializer {
         } else return (T) new HashSet<>();
     }
 
-    private <T> T deserializeQueue(List<?> value, Class<T> clazz, Type type) throws Exception {
+    private <T> T deserializeQueue(List<?> value, Class<T> clazz, Type type) throws JsonProcessingException {
         T queue = getQueueImpl(clazz);
         fillCollection(value, clazz, (ParameterizedType) type, queue);
         return queue;
@@ -174,21 +184,25 @@ public class JsonDeserializer {
         } else return (T) new LinkedList<>();
     }
 
-    private <T> T deserializeList(List<?> value, Class<T> clazz, Type type) throws Exception {
+    private <T> T deserializeList(List<?> value, Class<T> clazz, Type type) throws JsonProcessingException {
         T list = getListImpl(clazz);
         fillCollection(value, clazz, (ParameterizedType) type, list);
         return list;
     }
 
-    private <T> void fillCollection(List<?> value, Class<T> clazz, ParameterizedType parameterizedType, T collection) throws Exception {
+    private <T> void fillCollection(List<?> value, Class<T> clazz, ParameterizedType parameterizedType, T collection) throws JsonProcessingException {
         Type listTypeArgument = parameterizedType.getActualTypeArguments()[0];
         for (Object element : value) {
-            Method methodAdd = clazz.getDeclaredMethod("add", Object.class);
-            methodAdd.invoke(collection, deserializeElement(
-                    element,
-                    (Class<?>) listTypeArgument,
-                    listTypeArgument)
-            );
+            try {
+                Method methodAdd = clazz.getDeclaredMethod("add", Object.class);
+                methodAdd.invoke(collection, deserializeElement(
+                        element,
+                        (Class<?>) listTypeArgument,
+                        listTypeArgument)
+                );
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                throw new JsonProcessingException(e);
+            }
         }
     }
 
@@ -204,7 +218,7 @@ public class JsonDeserializer {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T deserializeArray(Object value, Class<T> clazz, Type type) throws Exception {
+    public <T> T deserializeArray(Object value, Class<T> clazz, Type type) throws JsonProcessingException {
         if (!(value instanceof List<?> srcList)) {
             throw MismatchedInputException.deserializationTypeFrom(type.getTypeName(), "Array");
         }
@@ -212,7 +226,7 @@ public class JsonDeserializer {
         return (T) getFilledArray(srcList, componentType);
     }
 
-    private <T> T[] getFilledArray(List<?> value, Class<T> clazz) throws Exception {
+    private <T> T[] getFilledArray(List<?> value, Class<T> clazz) throws JsonProcessingException {
         @SuppressWarnings("unchecked")
         T[] array = (T[]) Array.newInstance(clazz, value.size());
         for (int i = 0; i < value.size(); i++) {
@@ -340,7 +354,7 @@ public class JsonDeserializer {
         return (T) Boolean.valueOf(valueAsString);
     }
 
-    private void checkIfClassContainsFieldWithName(Class<?> clazz, String fieldName) {
+    private void checkIfClassContainsFieldWithName(Class<?> clazz, String fieldName) throws JsonProcessingException {
         Set<String> clazzFieldNames = getClassFieldNames(clazz);
         if (!clazzFieldNames.contains(fieldName)) {
             throw new JsonProcessingException(String.format(
