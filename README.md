@@ -5,7 +5,7 @@ It can also be used to convert a JSON string to an equivalent Java object.
 
 ## Using SBJson
 
-The primary class to use is [`ObjectMapper`](sbjson/src/main/java/ru/clevertec/sbjson/ObjectMapper.java) which you 
+The primary class to use is [`ObjectMapper`](src/main/java/ru/clevertec/sbjson/ObjectMapper.java) which you 
 can just create by calling `new ObjectMapper()`.
 
 The `ObjectMapper` instance does not maintain any state while invoking JSON operations. So, you are free to reuse 
